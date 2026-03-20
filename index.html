@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Metodologias de Melhoria Contínua</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root {
+      --bg-base: #f4f3f0;
+      --bg-card: #fafaf8;
+      --border: #e2e0da;
+      --text-primary: #1c1c1e;
+      --text-secondary: #6b7280;
+      --sidebar-w: 272px;
+    }
+
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg-base); color: var(--text-primary); margin: 0; }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d1cfc9; border-radius: 99px; }
+
+    /* ── Sidebar ── */
+    #sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: var(--sidebar-w);
+      background: #fff; border-right: 1px solid var(--border);
+      overflow-y: auto; z-index: 40;
+      display: flex; flex-direction: column;
+    }
+    #main { margin-left: var(--sidebar-w); min-height: 100vh; padding: 2.5rem 2.5rem 4rem; }
+
+    /* ── Nav buttons ── */
+    .nav-btn {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 9px 16px; border-radius: 8px;
+      font-size: 0.875rem; font-weight: 500;
+      color: var(--text-secondary); background: transparent; border: none;
+      cursor: pointer; text-align: left; transition: all 0.15s ease;
+    }
+    .nav-btn:hover { background: var(--bg-base); color: var(--text-primary); }
+    .nav-btn.active { background: var(--text-primary); color: #fff; }
+    .nav-btn .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; border: 2px solid currentColor; opacity: 0.6; }
+    .nav-btn.active .dot { background: white; border-color: white; opacity: 1; }
+
+    /* ── Metodologia Cards ── */
+    .met-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 1.5rem; cursor: pointer;
+      transition: all 0.2s ease; position: relative; overflow: hidden;
+      animation: fadeInUp 0.3s ease both;
+    }
+    .met-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--card-accent, #94a3b8); opacity: 0.6;
+    }
+    .met-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.07); transform: translateY(-2px); border-color: #c9c7c0; }
+    .met-card:hover::before { opacity: 1; }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 99px;
+      font-size: 0.72rem; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase;
+    }
+
+    /* ── Modal ── */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(15,15,15,0.45); backdrop-filter: blur(4px);
+      z-index: 100; display: flex; align-items: center; justify-content: center; padding: 1rem;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+    }
+    .modal-backdrop.open { opacity: 1; pointer-events: all; }
+    .modal-box {
+      background: #fff; border-radius: 20px; width: 100%; max-width: 720px;
+      max-height: 90vh; overflow-y: auto;
+      transform: translateY(16px) scale(0.98); transition: transform 0.25s ease;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.18);
+    }
+    .modal-backdrop.open .modal-box { transform: translateY(0) scale(1); }
+
+    .section-label {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px;
+    }
+    .prose-text { font-size: 0.9rem; line-height: 1.75; color: #374151; }
+    .example-block {
+      background: #f8f7f4; border: 1px solid var(--border);
+      border-left: 3px solid #94a3b8; border-radius: 10px;
+      padding: 1rem 1.25rem; font-family: 'DM Mono', monospace;
+      font-size: 0.82rem; color: #475569; line-height: 1.7;
+    }
+    .pro-item, .con-item {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-size: 0.875rem; color: #374151; padding: 6px 0;
+      border-bottom: 1px solid #f0eeeb;
+    }
+    .pro-item:last-child, .con-item:last-child { border-bottom: none; }
+    .author-card { margin: 1.5rem; padding: 1.25rem; background: var(--bg-base); border: 1px solid var(--border); border-radius: 12px; }
+
+    /* ── Animations ── */
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ══════════════════════════════
+       CASOS PRÁTICOS
+    ══════════════════════════════ */
+    .caso-card {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 18px; overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+      animation: fadeInUp 0.35s ease both;
+    }
+    .caso-header { padding: 1.75rem 2rem 1.5rem; border-bottom: 1px solid var(--border); }
+    .caso-body   { padding: 1.75rem 2rem 2rem; }
+
+    /* Stepper */
+    .stepper {
+      display: flex; align-items: flex-start;
+      position: relative; overflow-x: auto; padding-bottom: 0.5rem;
+    }
+    .step-item {
+      display: flex; flex-direction: column; align-items: center;
+      flex: 1; min-width: 130px; position: relative; cursor: pointer;
+      padding: 0 4px;
+    }
+    /* Connecting line */
+    .step-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 21px;
+      left: calc(50% + 22px);
+      right: calc(-50% + 22px);
+      height: 2px;
+      background: linear-gradient(90deg, var(--step-color, #94a3b8) 0%, var(--next-color, #94a3b8) 100%);
+      z-index: 0;
+    }
+    .step-node {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 700; font-family: 'DM Mono', monospace;
+      color: #fff; z-index: 1; position: relative;
+      border: 3px solid #fff;
+      box-shadow: 0 0 0 2px var(--step-color, #94a3b8), 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      flex-shrink: 0;
+    }
+    .step-item:hover .step-node,
+    .step-item.active-step .step-node {
+      transform: scale(1.18);
+      box-shadow: 0 0 0 3px var(--step-color, #94a3b8), 0 8px 24px rgba(0,0,0,0.18);
+    }
+    .step-label {
+      margin-top: 10px; font-size: 0.7rem; font-weight: 800;
+      letter-spacing: 0.04em; text-align: center;
+      text-transform: uppercase; padding: 0 4px; line-height: 1.3;
+    }
+    .step-action {
+      font-size: 0.73rem; color: var(--text-secondary);
+      text-align: center; padding: 0 4px; margin-top: 3px; line-height: 1.3;
+    }
+
+    /* Detail panel */
+    .step-detail {
+      display: none; margin-top: 1.25rem;
+      background: var(--bg-base); border: 1px solid var(--border);
+      border-left: 4px solid #94a3b8; border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      animation: slideDown 0.2s ease;
+    }
+    .step-detail.visible { display: block; }
+
+    /* Flow diagram */
+    .flow-diagram { display: flex; align-items: stretch; flex-wrap: wrap; gap: 0; }
+    .flow-block {
+      flex: 1; min-width: 80px; max-width: 200px;
+      padding: 9px 12px; font-size: 0.75rem; font-weight: 600;
+      text-align: center; position: relative;
+      display: flex; align-items: center; justify-content: center;
+      line-height: 1.3;
+    }
+    .flow-block:not(:last-child)::after {
+      content: '→';
+      position: absolute; right: -11px; top: 50%; transform: translateY(-50%);
+      font-size: 0.9rem; color: #9ca3af; z-index: 2; font-weight: 400;
+    }
+    .flow-block.as-is {
+      background: #fef2f2; border: 1px solid #fecaca; color: #991b1b;
+      border-radius: 8px; margin-right: 18px;
+    }
+    .flow-block.to-be {
+      background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534;
+      border-radius: 8px; margin-right: 18px;
+    }
+    .flow-block.as-is:last-child,
+    .flow-block.to-be:last-child { margin-right: 0; }
+    .flow-block.as-is:last-child::after,
+    .flow-block.to-be:last-child::after { display: none; }
+
+    /* Impact */
+    .impact-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #ecfdf5; color: #065f46; border: 1px solid #6ee7b7;
+      border-radius: 99px; padding: 5px 14px;
+      font-size: 0.78rem; font-weight: 700; flex-shrink: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      #sidebar { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid var(--border); }
+      #main { margin-left: 0; padding: 1.5rem; }
+      .step-item { min-width: 100px; }
+      .caso-header, .caso-body { padding: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════ SIDEBAR ══════════════════ -->
+<aside id="sidebar">
+
+  <div style="padding:1.5rem 1.5rem 1.25rem;border-bottom:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:32px;height:32px;background:#1c1c1e;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L10 6H14L11 9L12 13L8 11L4 13L5 9L2 6H6L8 2Z" fill="white" fill-opacity="0.9"/></svg>
+      </div>
+      <div>
+        <p style="font-size:0.72rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#9ca3af;margin:0">Metodologias de</p>
+        <p style="font-size:1rem;font-weight:700;color:#1c1c1e;margin:0;line-height:1.1">Melhoria Contínua</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:1rem;flex:1;display:flex;flex-direction:column;gap:0">
+
+    <!-- Seções principais -->
+    <p class="section-label" style="padding:0 8px;margin-bottom:6px;margin-top:4px">Navegação</p>
+    <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:1.25rem">
+      <button class="nav-btn active" id="nav-met" onclick="showSection('metodologias',this)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Metodologias
+      </button>
+      <button class="nav-btn" id="nav-casos" onclick="showSection('casos',this)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Casos Práticos
+        <span id="casos-count" style="margin-left:auto;background:#e5e7eb;color:#374151;font-size:0.65rem;font-weight:700;padding:1px 7px;border-radius:99px">0</span>
+      </button>
+    </div>
+
+    <!-- Filtros de categoria -->
+    <div id="cat-filters">
+      <p class="section-label" style="padding:0 8px;margin-bottom:6px">Categorias</p>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <button class="nav-btn active" data-filter="all" onclick="setFilter('all',this)">
+          <span class="dot"></span>Todas
+        </button>
+        <button class="nav-btn" data-filter="Mapeamento" onclick="setFilter('Mapeamento',this)">
+          <span class="dot" style="background:#3b82f6;border-color:#3b82f6;opacity:1"></span>
+          Mapeamento
+          <span style="margin-left:auto;font-size:0.68rem;opacity:0.45">Onde estamos?</span>
+        </button>
+        <button class="nav-btn" data-filter="Diagnóstico" onclick="setFilter('Diagnóstico',this)">
+          <span class="dot" style="background:#ef4444;border-color:#ef4444;opacity:1"></span>
+          Diagnóstico
+          <span style="margin-left:auto;font-size:0.68rem;opacity:0.45">Por que quebra?</span>
+        </button>
+        <button class="nav-btn" data-filter="Execução" onclick="setFilter('Execução',this)">
+          <span class="dot" style="background:#22c55e;border-color:#22c55e;opacity:1"></span>
+          Execução
+          <span style="margin-left:auto;font-size:0.68rem;opacity:0.45">Mão na massa</span>
+        </button>
+        <button class="nav-btn" data-filter="Estratégia" onclick="setFilter('Estratégia',this)">
+          <span class="dot" style="background:#a855f7;border-color:#a855f7;opacity:1"></span>
+          Estratégia
+          <span style="margin-left:auto;font-size:0.68rem;opacity:0.45">A filosofia</span>
+        </button>
+        <button class="nav-btn" data-filter="Controle" onclick="setFilter('Controle',this)">
+          <span class="dot" style="background:#eab308;border-color:#eab308;opacity:1"></span>
+          Controle
+          <span style="margin-left:auto;font-size:0.68rem;opacity:0.45">Manter o ganho</span>
+        </button>
+      </div>
+      <p id="counter" style="margin-top:1rem;padding:0 8px;font-size:0.78rem;color:#9ca3af"></p>
+    </div>
+
+  </div>
+
+  <!-- Author -->
+  <div class="author-card">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+      <div id="author-avatar" style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#e2e8f0,#cbd5e1);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.2rem">👤</div>
+      <div>
+        <p id="author-name" style="font-weight:600;font-size:0.9rem;margin:0;color:#1c1c1e">Seu Nome</p>
+        <p id="author-role" style="font-size:0.75rem;color:#6b7280;margin:0">Analista Financeiro · Vibe Coder</p>
+      </div>
+    </div>
+    <p id="author-bio" style="font-size:0.78rem;line-height:1.6;color:#6b7280;margin:0 0 12px">Apaixonado por transformar processos em sistemas inteligentes.</p>
+    <div style="display:flex;gap:8px">
+      <a id="author-linkedin" href="#" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:600;color:#0a66c2;text-decoration:none;padding:5px 10px;background:#eff6ff;border-radius:6px">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>LinkedIn
+      </a>
+      <a id="author-github" href="#" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;font-weight:600;color:#1c1c1e;text-decoration:none;padding:5px 10px;background:#f1f0ed;border-radius:6px">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>GitHub
+      </a>
+    </div>
+  </div>
+
+</aside>
+
+<!-- ══════════════════ MAIN ══════════════════ -->
+<main id="main">
+
+  <!-- SECTION: Metodologias -->
+  <div id="section-metodologias">
+    <div style="margin-bottom:2rem">
+      <h1 style="font-size:1.75rem;font-weight:700;color:#1c1c1e;margin:0 0 6px">Dashboard</h1>
+      <p style="font-size:0.9rem;color:#6b7280;margin:0">Navegue pelas metodologias de melhoria contínua</p>
+    </div>
+    <div style="position:relative;margin-bottom:2rem;max-width:480px">
+      <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#9ca3af" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input id="search-input" type="text" placeholder="Buscar metodologia…" oninput="renderCards()"
+        style="width:100%;padding:10px 14px 10px 40px;border:1px solid var(--border);border-radius:10px;background:#fff;font-family:inherit;font-size:0.875rem;color:#1c1c1e;outline:none;transition:border-color 0.15s"
+        onfocus="this.style.borderColor='#94a3b8'" onblur="this.style.borderColor='var(--border)'" />
+    </div>
+    <div id="cards-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem"></div>
+    <div id="empty-state" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:300px;color:#9ca3af;text-align:center">
+      <div style="font-size:3rem;margin-bottom:12px">🔍</div>
+      <p style="font-weight:600;margin:0 0 4px">Nenhum resultado</p>
+      <p style="font-size:0.85rem;margin:0">Tente outro filtro ou busca</p>
+    </div>
+  </div>
+
+  <!-- SECTION: Casos Práticos -->
+  <div id="section-casos" style="display:none">
+    <div style="margin-bottom:2rem">
+      <h1 style="font-size:1.75rem;font-weight:700;color:#1c1c1e;margin:0 0 6px">Livraria de Soluções</h1>
+      <p style="font-size:0.9rem;color:#6b7280;margin:0">Casos com metodologias encadeadas — do problema ao resultado. Clique nas etapas para explorar.</p>
+    </div>
+    <div id="casos-grid" style="display:flex;flex-direction:column;gap:2rem"></div>
+  </div>
+
+</main>
+
+<!-- ══════════════════ MODAL (Metodologias) ══════════════════ -->
+<div id="modal-backdrop" class="modal-backdrop" onclick="closeModal(event)">
+  <div id="modal" class="modal-box" onclick="event.stopPropagation()">
+    <div style="padding:1.75rem 1.75rem 1.25rem;border-bottom:1px solid var(--border);position:relative">
+      <button onclick="forceCloseModal()" style="position:absolute;top:1.25rem;right:1.25rem;width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:#f8f7f4;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6b7280">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+      <span id="modal-badge" class="badge" style="margin-bottom:10px;display:inline-flex"></span>
+      <h2 id="modal-title" style="font-size:1.5rem;font-weight:700;margin:0;color:#1c1c1e;line-height:1.2"></h2>
+      <p id="modal-tldr" style="font-size:0.875rem;color:#6b7280;margin:8px 0 0;font-style:italic"></p>
+    </div>
+    <div style="padding:1.75rem">
+      <div style="margin-bottom:1.5rem">
+        <p class="section-label">O que é</p>
+        <p id="modal-o_que_e" class="prose-text" style="margin:0"></p>
+      </div>
+      <div style="margin-bottom:1.5rem">
+        <p class="section-label">Explicação técnica</p>
+        <p id="modal-explicacao" class="prose-text" style="margin:0"></p>
+      </div>
+      <div style="margin-bottom:1.75rem">
+        <p class="section-label">Exemplo prático</p>
+        <div id="modal-exemplo" class="example-block"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div>
+          <p class="section-label" style="display:flex;align-items:center;gap:6px"><span style="color:#22c55e">↑</span> Vantagens</p>
+          <div id="modal-pros"></div>
+        </div>
+        <div>
+          <p class="section-label" style="display:flex;align-items:center;gap:6px"><span style="color:#ef4444">↓</span> Limitações</p>
+          <div id="modal-cons"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ DATA & LOGIC ══════════════════ -->
+<script>
+
+const METODOLOGIAS = [
+  // ─── MAPEAMENTO ───
+  {
+    id: "sipoc", titulo: "SIPOC", categoria: "Mapeamento",
+    tldr: "O Google Maps do seu processo. Veja o macro antes de mergulhar no micro.",
+    o_que_e: "Ferramenta de visualização de alto nível para entender as fronteiras de um processo.",
+    explicacao: "O acrônimo SIPOC (Suppliers, Inputs, Process, Outputs, Customers) é uma técnica de mapeamento linear que define o escopo rigoroso de um sistema. Ele isola o processo para identificar quem fornece os dados/materiais, quais são os gatilhos de entrada, as 5 a 7 etapas macro do processamento, o produto final gerado e quem é o consumidor desse output. É essencial para evitar o 'scope creep' e garantir que todos os stakeholders concordem onde o processo começa e termina.",
+    exemplo_generico: "Mapeamento de Integração de IA: O provedor de dados fornece o dataset (S/I), o modelo processa via inferência local (P), gera um arquivo JSON estruturado (O) para o dashboard do usuário final (C).",
+    pros: ["Alinhamento de fronteiras de sistema", "Identifica entradas críticas"],
+    cons: ["Abstrai a complexidade lógica interna", "Não lida com condicionais (if/else)"],
+    cor_tema: "blue"
+  },
+  {
+    id: "vsm", titulo: "Value Stream Map (VSM)", categoria: "Mapeamento",
+    tldr: "O raio-x do desperdício. Diferencie o que agrega valor do que é apenas ruído.",
+    o_que_e: "Mapeamento de fluxo de valor que rastreia materiais e informações do início ao fim.",
+    explicacao: "O VSM vai além do fluxo de etapas; ele analisa o fluxo de informações e o tempo (Lead Time vs. Value-Add Time). A técnica consiste em desenhar o estado atual identificando gargalos, estoques intermediários e filas de espera. O objetivo é calcular o 'Takt Time' (ritmo de demanda) e redesenhar o sistema para que o fluxo seja contínuo, eliminando atividades que consomem recursos mas não transformam o produto sob a perspectiva do cliente.",
+    exemplo_generico: "Fechamento Contábil: Mapear desde a recepção da nota até o lançamento. Identificar que 80% do tempo o documento está 'parado' aguardando aprovação manual.",
+    pros: ["Visão clara de gargalos temporais", "Foco em eficiência sistêmica"],
+    cons: ["Curva de aprendizado alta para leitura", "Pode se tornar obsoleto rapidamente se o processo mudar"],
+    cor_tema: "blue"
+  },
+  {
+    id: "bpmn", titulo: "BPMN 2.0", categoria: "Mapeamento",
+    tldr: "A sintaxe universal dos processos. Se o SIPOC é o mapa, o BPMN é o algoritmo.",
+    o_que_e: "Notação padrão para modelagem de processos de negócio.",
+    explicacao: "O BPMN (Business Process Model and Notation) fornece uma linguagem gráfica para especificar fluxos de trabalho com precisão lógica. Diferente de um fluxograma simples, ele possui semântica rigorosa para lidar com paralelismo (gateways), eventos temporais, tratamento de exceções e troca de mensagens entre diferentes sistemas (pools/lanes). É a base para a automação: um modelo BPMN bem desenhado pode ser convertido em lógica de execução ou importado para um BPMS (Business Process Management Suite), que funciona como o 'backend' que orquestra as tarefas, integra APIs e gerencia o estado do processo.",
+    exemplo_generico: "Orquestração de IA: Um evento de recebimento de e-mail dispara um gateway que decide se envia o anexo para o OCR local ou para análise de fraude via LLM.",
+    pros: ["Ambiguidade zero para desenvolvedores", "Suporta lógica complexa e exceções"],
+    cons: ["Curva de aprendizado para a sintaxe completa", "Pode se tornar excessivamente denso (spaghetti)"],
+    cor_tema: "blue"
+  },
+
+  // ─── ANÁLISE (DEBUG) ───
+  {
+    id: "ishikawa", titulo: "Ishikawa (6M)", categoria: "Diagnóstico",
+    tldr: "O 'Debug' de processos. Encontre a causa raiz, não o sintoma.",
+    o_que_e: "Diagrama de causa e efeito para categorização de falhas sistêmicas.",
+    explicacao: "Também conhecido como Espinha de Peixe, o diagrama organiza as hipóteses de falha em 6 dimensões (Método, Máquina, Medida, Meio Ambiente, Mão de Obra e Material). Em um contexto técnico, funciona como um 'stack trace' visual: você parte do efeito indesejado (o bug) e retrocede sistematicamente em cada categoria para entender se a falha é de infraestrutura (Máquina), de algoritmo (Método) ou de integridade de dados (Material).",
+    exemplo_generico: "Falha na automação de relatórios: O script quebrou (Método), o servidor local ficou sem RAM (Máquina) ou o CSV veio corrompido (Material)?",
+    pros: ["Estrutura o pensamento analítico", "Evita focar apenas no óbvio"],
+    cons: ["Não quantifica a relevância de cada causa", "Depende de brainstorm de qualidade"],
+    cor_tema: "red"
+  },
+  {
+    id: "5-porques", titulo: "5 Porquês", categoria: "Diagnóstico",
+    tldr: "Drilldown profundo. Não pare na superfície do erro.",
+    o_que_e: "Técnica de investigação iterativa para chegar à causa fundamental.",
+    explicacao: "A técnica consiste em perguntar 'por que' diante de um problema, usando a resposta anterior como base para a próxima pergunta. O objetivo é ultrapassar as causas imediatas (que geralmente são falhas humanas ou acidentais) para encontrar as causas sistêmicas (falhas de design ou política). Embora o nome sugira 'cinco', o ciclo continua até que a remoção da causa impeça a reincidência do erro.",
+    exemplo_generico: "Erro no banco de dados: Por que caiu? Sem memória. Por que? O script não fechou a conexão. Por que? Não havia tratamento de erro no loop. Por que? Falta de padrão de código.",
+    pros: ["Extremamente simples e eficaz", "Foca em soluções permanentes"],
+    cons: ["Pode levar a conclusões lineares demais", "Risco de parar na 'culpa' e não no 'sistema'"],
+    cor_tema: "red"
+  },
+  {
+    id: "pareto", titulo: "Gráfico de Pareto (80/20)", categoria: "Diagnóstico",
+    tldr: "Priorização Matemática. Foque nos 20% das causas que geram 80% dos problemas.",
+    o_que_e: "Ferramenta estatística baseada no princípio de que a maioria dos efeitos vem de poucas causas.",
+    explicacao: "O Diagrama de Pareto organiza as ocorrências por frequência em ordem decrescente, permitindo identificar a 'curva de acumulação'. Em sistemas de alta complexidade, é impossível (e ineficiente) debugar tudo ao mesmo tempo. O Pareto fornece o embasamento numérico para decidir qual gargalo atacar primeiro. Se 80% do tempo de processamento da sua IA local é gasto em apenas um tipo de query ou carregamento de modelo, é ali que a otimização deve ocorrer, ignorando as causas triviais que consomem pouco recurso.",
+    exemplo_generico: "Análise de Erros em Notas Fiscais: Identificar que 80% das rejeições são causadas por apenas 2 tipos de erros de preenchimento (os 'poucos vitais').",
+    pros: ["Evita desperdício de esforço em problemas irrelevantes", "Gera foco total no impacto"],
+    cons: ["Exige coleta de dados quantitativos prévia", "Pode ocultar problemas raros mas catastróficos"],
+    cor_tema: "red"
+  },
+
+  // ─── EXECUÇÃO (LOOPS) ───
+  {
+    id: "pdca", titulo: "Ciclo PDCA", categoria: "Execução",
+    tldr: "O loop 'while(true)' da melhoria. Planeje, faça, teste e ajuste.",
+    o_que_e: "Método iterativo de quatro passos para controle e melhoria contínua.",
+    explicacao: "É o algoritmo fundamental da melhoria contínua. 1. Plan: Estabelecer objetivos e processos baseados no gap atual. 2. Do: Implementar o plano e coletar dados (fase de teste). 3. Check: Comparar os resultados reais com os objetivos esperados (monitoramento de métricas). 4. Act: Se o resultado foi positivo, padroniza-se a solução; se não, reinicia-se o ciclo com os novos aprendizados. É a base para qualquer implementação de IA ou automação resiliente.",
+    exemplo_generico: "Refinamento de Prompt: Planejar o prompt, rodar o script (Do), medir a assertividade (Check), ajustar o contexto (Act).",
+    pros: ["Garante aprendizado contínuo", "Reduz riscos de grandes falhas"],
+    cons: ["Pode ser burocrático em startups", "Exige disciplina rigorosa de dados"],
+    cor_tema: "green"
+  },
+  {
+    id: "kaizen", titulo: "Kaizen", categoria: "Execução",
+    tldr: "Melhoria de 1% todo dia. O poder dos ganhos compostos no sistema.",
+    o_que_e: "Filosofia de melhoria incremental e contínua envolvendo todos os níveis.",
+    explicacao: "O Kaizen foca na eliminação de 'Muda' (desperdício) através de pequenas mudanças constantes, em vez de grandes revoluções arriscadas. No contexto de automação, trata-se de refatorar pequenos trechos de código, otimizar uma única query SQL ou reduzir 2 segundos em um processo de carga de dados. Ao longo de meses, essas pequenas otimizações geram um ganho de eficiência massivo sem necessidade de Capex elevado.",
+    exemplo_generico: "Otimização de Hardware Local: Ajustar os parâmetros de quantização de um modelo Gemma para rodar 5% mais rápido no Ryzen 7000.",
+    pros: ["Baixo custo de implementação", "Cria cultura de dono no time"],
+    cons: ["Resultados podem demorar a aparecer", "Exige persistência a longo prazo"],
+    cor_tema: "green"
+  },
+  {
+    id: "gemba-walk", titulo: "Gemba Walk", categoria: "Execução",
+    tldr: "Vá onde o dado nasce. A verdade não está no dashboard, está na ponta.",
+    o_que_e: "Prática de observar o processo real no local onde o valor é criado.",
+    explicacao: "Em japonês, 'Gemba' significa 'o lugar real'. No contexto de sistemas e finanças, o Gemba Walk não é apenas andar pela fábrica, mas sentar ao lado do analista que opera o legado ou observar o hardware executando a tarefa. É essencial para descobrir as 'gambiarras' (workarounds) que não aparecem no mapeamento oficial. Para um AI Builder, o Gemba é entender como o usuário final interage com o prompt ou onde a latência do hardware local realmente atrapalha a experiência do usuário.",
+    exemplo_generico: "Observar um analista financeiro conciliando extratos para entender por que ele ignora a automação atual e prefere o Excel manual.",
+    pros: ["Revela a realidade nua e crua", "Gera empatia com o usuário final"],
+    cons: ["Exige tempo e observação passiva", "Pode intimidar quem está sendo observado"],
+    cor_tema: "green"
+  },
+  {
+    id: "5s", titulo: "5S", categoria: "Execução",
+    tldr: "A base da estabilidade. Se o ambiente (físico ou digital) está um caos, o processo também está.",
+    o_que_e: "Programa de gestão de qualidade focado na organização, limpeza e disciplina.",
+    explicacao: "O 5S (Seiri, Seiton, Seiso, Seiketsu, Shitsuke) é a técnica japonesa para criar 'estabilidade básica'. Em sistemas, o 5S é aplicado na higienização de dados e na arquitetura de diretórios: 1. Seiri (Senso de Utilização): Eliminar bibliotecas e arquivos mortos. 2. Seiton (Organização): Cada arquivo em seu 'path' lógico. 3. Seiso (Limpeza): Refatoração de código e deleção de logs desnecessários. 4. Seiketsu (Padronização): Uso de linters, formatadores e convenções de nomenclatura. 5. Shitsuke (Disciplina): Manter o rigor técnico no longo prazo. Sem 5S, o custo cognitivo de manutenção de um sistema escala exponencialmente.",
+    exemplo_generico: "Organização de Laboratório de IA: Padronizar nomes de modelos quantizados (.gguf), documentar versões de drivers e limpar datasets temporários para evitar estouro de disco local.",
+    pros: ["Reduz erro por distração", "Aumenta a velocidade de resposta (retrieval time)"],
+    cons: ["Frequentemente subestimado como 'faxina'", "Exige mudança cultural contínua"],
+    cor_tema: "green"
+  },
+
+  // ─── FILOSOFIAS (STACK) ───
+  {
+    id: "lean", titulo: "Lean", categoria: "Estratégia",
+    tldr: "Fazer mais com menos. Elimine o desperdício obsessivamente.",
+    o_que_e: "Filosofia focada na maximização do valor e eliminação total de desperdícios.",
+    explicacao: "O Lean identifica 8 grandes desperdícios: superprodução, espera, transporte, excesso de processamento, inventário, movimentação, defeitos e talento subutilizado. Em sistemas de informação, o Lean se traduz em 'Zero-Dependency', código limpo e arquiteturas que não consomem mais RAM/CPU do que o estritamente necessário para entregar o valor ao usuário final.",
+    exemplo_generico: "Arquitetura Local-First: Rodar processamento pesado no edge (cliente) para eliminar latência e custos de servidor cloud desnecessários.",
+    pros: ["Extrema agilidade operacional", "Redução drástica de custos"],
+    cons: ["Pode tornar o sistema 'frágil' por falta de redundância", "Exige alta competência técnica"],
+    cor_tema: "purple"
+  },
+  {
+    id: "six-sigma", titulo: "Six Sigma (DMAIC)", categoria: "Estratégia",
+    tldr: "Guerra à variabilidade. Estatística aplicada para erro quase zero.",
+    o_que_e: "Metodologia quantitativa para reduzir defeitos e variabilidade em processos.",
+    explicacao: "Focada no desvio padrão ($\sigma$), o objetivo é atingir 3,4 defeitos por milhão de oportunidades. Utiliza o método DMAIC (Define, Measure, Analyze, Improve, Control). É o rigor analítico puro: utiliza testes de hipóteses, ANOVA e regressão para provar que uma mudança no sistema realmente causou a melhoria. Em Finanças e IA, o Six Sigma é aplicado para garantir a confiabilidade dos outputs e a integridade dos dados, eliminando 'alucinações' sistêmicas através de controle estatístico.",
+    exemplo_generico: "Reduzir a variação no tempo de resposta de uma API local de IA, garantindo que 99,9% das requisições terminem em menos de 2 segundos.",
+    pros: ["Decisões baseadas em dados estatísticos", "Redução drástica de desperdício por erro"],
+    cons: ["Complexidade estatística elevada", "Pode ser excessivamente rígido para processos criativos"],
+    cor_tema: "purple"
+  },
+  {
+    id: "agile", titulo: "Agile (Scrum/Kanban)", categoria: "Estratégia",
+    tldr: "Iterações curtas e feedback constante. O oposto do 'Waterfall'.",
+    o_que_e: "Mentalidade de desenvolvimento iterativo focada em entrega de valor incremental.",
+    explicacao: "O Agile prioriza indivíduos e interações sobre processos e ferramentas. No desenvolvimento de sistemas de IA, manifesta-se em Sprints onde se busca um MVP (Produto Mínimo Viável) funcional a cada 2 semanas. O foco é responder rapidamente a mudanças de requisitos. O Kanban ajuda na visualização do fluxo ('Work in Progress'), enquanto o Scrum estrutura os ritos de inspeção e adaptação.",
+    exemplo_generico: "Desenvolver um buscador de documentos local: Sprint 1 (Indexação), Sprint 2 (Busca Semântica), Sprint 3 (Interface UI).",
+    pros: ["Alta adaptabilidade", "Entrega valor mais rápido"],
+    cons: ["Risco de perder a visão do todo", "Exige time altamente colaborativo"],
+    cor_tema: "purple"
+  },
+  {
+    id: "wcm", titulo: "WCM (World Class Manufacturing)", categoria: "Estratégia",
+    tldr: "O estado da arte da produção. Integração total de pilares técnicos.",
+    o_que_e: "Sistema de gestão focado em zero acidentes, zero defeitos e zero quebras.",
+    explicacao: "O WCM organiza a melhoria em pilares (Manutenção Autônoma, Manutenção Profissional, Melhoria Focada, etc.). É uma evolução do Lean que foca intensamente na redução de custos através da eliminação de perdas identificadas no 'Cost Deployment' (Matriz de Perdas). Para um builder, o WCM ensina a importância da manutenção preventiva do hardware (seu Ryzen/GPU) e da robustez do código para evitar 'quebras' em produção.",
+    exemplo_generico: "Aplicar o pilar de 'Melhoria Focada' para eliminar o custo de processamento redundante em um script de extração de dados financeiros.",
+    pros: ["Visão holística da organização", "Forte foco em redução de custos reais"],
+    cons: ["Extremamente complexo de implementar", "Requer mudança cultural profunda"],
+    cor_tema: "purple"
+  },
+
+
+  // ─── CONTROLE (MONITOR) ───
+  {
+    id: "poka-yoke", titulo: "Poka-Yoke", categoria: "Controle",
+    tldr: "À prova de erros. Desenhe o sistema para que o erro seja impossível.",
+    o_que_e: "Mecanismo físico ou lógico que impede a ocorrência de erros humanos.",
+    explicacao: "Originário da Toyota, o Poka-Yoke visa 'error-proofing'. Em software e automação, isso se traduz em validações de esquema (JSON Schema), tipagem estática, testes unitários automatizados ou travas em formulários que impedem o envio de dados inconsistentes. O objetivo é que o sistema recuse o input incorreto antes mesmo de tentar processá-lo, evitando o reprocessamento posterior.",
+    exemplo_generico: "Validador de Script: Um decorador em Python que verifica se o arquivo de entrada tem o cabeçalho correto antes de iniciar a análise de IA.",
+    pros: ["Elimina erro humano na fonte", "Reduz custos de inspeção"],
+    cons: ["Pode tornar o sistema rígido demais", "Exige antecipação de todos os erros possíveis"],
+    cor_tema: "yellow"
+  },
+  {
+    id: "kpis", titulo: "KPIs & Dashboards", categoria: "Controle",
+    tldr: "O que não é medido não é gerenciado. Visibilidade total dos sinais vitais.",
+    o_que_e: "Indicadores-chave de desempenho usados para monitorar a saúde do processo.",
+    explicacao: "KPIs (Key Performance Indicators) são métricas quantificáveis que refletem o sucesso de um processo. Um bom sistema de controle não apenas coleta dados, mas os visualiza em dashboards que permitem identificar tendências, desvios padrão e outliers em tempo real. Nas finanças, isso significa monitorar margens e variações; na IA local, significa monitorar tokens por segundo (TPS) e precisão do output.",
+    exemplo_generico: "Dashboard de Performance: Monitorar a economia mensal gerada pela automação vs. o custo de energia/hardware da infraestrutura local.",
+    pros: ["Tomada de decisão baseada em fatos", "Identificação precoce de problemas"],
+    cons: ["Risco de medir as métricas erradas (vanity metrics)", "Exige qualidade de dados impecável"],
+    cor_tema: "yellow"
+  },
+  {
+    id: "okr", titulo: "OKR", categoria: "Controle",
+    tldr: "Direcionamento estratégico. Onde queremos chegar e como medimos?",
+    o_que_e: "Framework de definição de metas focado em Objetivos e Resultados-Chave.",
+    explicacao: "Diferente de KPIs (que medem a saúde), OKRs focam em mudança e crescimento. Um Objetivo (O) é qualitativo e inspirador; os Key Results (KRs) são métricas quantitativas que provam que você chegou lá. É a conexão entre o 'porquê' fazemos algo e o 'como' o sistema deve performar para atingir o sucesso. No seu laboratório, um OKR define a evolução da sua stack técnica.",
+    exemplo_generico: "Objetivo: Tornar a análise financeira 100% local. KR1: Migrar 5 fluxos do Cloud para o Gemma. KR2: Reduzir tempo de resposta em 40%.",
+    pros: ["Alinhamento de propósito", "Foco em resultados, não em tarefas"],
+    cons: ["Pode gerar frustração se os KRs forem irreais", "Confundido facilmente com lista de afazeres"],
+    cor_tema: "yellow"
+  },
+
+  // ─── EXECUÇÃO (LOOPS) ───
+
+
+  // ─── FILOSOFIAS (STACK) ───
+
+
+];
+
+// ─────────────────────────────────────────────────
+// CASOS PRÁTICOS
+// ─────────────────────────────────────────────────
+const CASOS_PRATICOS = [
+  {
+    id: "automacao-financeira-local",
+    titulo: "Arquitetura de Consolidação de Dados de Filiais",
+    setor: "Finanças & Controladoria",
+    problema: "Alta variabilidade nos inputs das filiais e latência no processamento manual (Lead Time de 3 dias).",
+    jornada: [
+      {
+        ordem: 1, metodologia: "SIPOC", cor: "blue", icone: "S",
+        acao: "Mapeamento de Fronteiras",
+        resultado: "Identificado que o 'Input' (arquivos das filiais) não possuía contrato de interface (schema fixo), gerando quebras no 'Process' (consolidação)."
+      },
+      {
+        ordem: 2, metodologia: "Ishikawa (6M)", cor: "red", icone: "6M",
+        acao: "Diagnóstico de Erros",
+        resultado: "A categoria 'Método' era a causa raiz: a falta de validação prévia permitia que dados corrompidos entrassem no sistema, exigindo reprocessamento cíclico."
+      },
+      {
+        ordem: 3, metodologia: "Poka-Yoke + Python", cor: "violet", icone: "PY",
+        acao: "Script de Validação Local",
+        resultado: "Desenvolvimento de um validador (schema validation) em Python. O sistema agora recusa arquivos fora do padrão antes da tentativa de consolidação."
+      },
+      {
+        ordem: 4, metodologia: "IA Local (Qwen/Deepseek/Ollama)", cor: "orange", icone: "AI",
+        acao: "Classificação de Transações",
+        resultado: "Implementação de modelo local para categorizar descritivos de despesas não estruturados, reduzindo a classificação manual de exceções."
+      }
+    ],
+    as_is: ["Envio descentralizado via e-mail", "Triagem manual de erros", "Tratamento de exceções por humano", "Consolidação em lote"],
+    to_be: ["Upload em diretório monitorado", "Validação automática (Poka-Yoke)", "Enriquecimento via IA Local", "Output estruturado para Dashboard"],
+    impacto_final: "Redução drástica no reprocessamento. O fluxo tornou-se previsível, com tempo de ciclo (Lead Time) estimado em poucas horas após o recebimento dos dados."
+  },
+  {
+    id: "compliance-normativo-sac",
+    titulo: "Monitoramento de Conformidade em Respostas de SAC",
+    setor: "Compliance & Ouvidoria",
+    problema: "Risco de sanções regulatórias por respostas ao SAC que não citam as normas vigentes ou prazos legais obrigatórios.",
+    jornada: [
+      {
+        ordem: 1, metodologia: "BPMN 2.0", cor: "blue", icone: "B",
+        acao: "Modelagem do Fluxo de Resposta",
+        resultado: "Mapeado que o ponto de falha era o 'handover' entre o técnico que resolve o problema e o atendente que redige a resposta final."
+      },
+      {
+        ordem: 2, metodologia: "5 Porquês", cor: "red", icone: "5W",
+        acao: "Análise de Erro Normativo",
+        resultado: "Causa Raiz: O atendente não consultava o normativo atualizado por ser um PDF de 200 páginas difícil de navegar durante o atendimento."
+      },
+      {
+        ordem: 3, metodologia: "RAG Local (Local-first AI)", cor: "orange", icone: "RAG",
+        acao: "Indexação de Normas",
+        resultado: "Criação de um sistema de busca semântica local (RAG) que sugere o parágrafo da norma relevante para cada tipo de reclamação detectada no texto."
+      }
+    ],
+    as_is: ["Atendente redige livremente", "Supervisor revisa por amostragem", "Risco alto de autuação", "Retrabalho após auditoria"],
+    to_be: ["Draft gerado pelo atendente", "IA local valida contra normas indexadas", "Alerta de 'falta citação obrigatória'", "Envio seguro"],
+    impacto_final: "Mitigação de riscos regulatórios e maior precisão técnica nas respostas oficiais da cooperativa."
+  },
+  {
+    id: "fluxo-renegociacao-agencia",
+    titulo: "Otimização do Fluxo de Formalização de Crédito",
+    setor: "Operações & Agências",
+    problema: "Cooperado aguardando mais de 40 minutos na agência para assinar termos de renegociação devido à desorganização documental.",
+    jornada: [
+      {
+        ordem: 1, metodologia: "Gemba Walk", cor: "green", icone: "GW",
+        acao: "Observação em Agência",
+        resultado: "Percebeu-se que o gerente perdia aprox. 15 minutos procurando quais documentos eram obrigatórios para cada tipo de linha de crédito no manual interno."
+      },
+      {
+        ordem: 2, metodologia: "Kaizen (Melhoria de Interface)", cor: "purple", icone: "K",
+        acao: "Matriz de Documentos Dinâmica",
+        resultado: "Substituição do manual em PDF por uma ferramenta simples de 'Checklist Dinâmico'. O gerente seleciona o produto e o sistema lista apenas o necessário."
+      },
+      {
+        ordem: 3, metodologia: "Lean (Eliminação de Espera)", cor: "blue", icone: "L",
+        acao: "Paralelização de Tarefas",
+        resultado: "Reestruturação do fluxo: enquanto o cooperado toma café, o backoffice valida os documentos digitalizados em tempo real, em vez de esperar o fim do atendimento."
+      }
+    ],
+    as_is: ["Gerente busca manual", "Imprime tudo (mesmo o desnecessário)", "Cooperado assina", "Backoffice recusa por falta de assinatura em 1 via"],
+    to_be: ["Checklist sistêmico", "Impressão direcionada", "Validação em tempo real durante o atendimento", "Fluxo contínuo"],
+    impacto_final: "Redução do tempo de espera do cooperado em 50%. Melhoria na experiência de atendimento e redução de custos com papel e retrabalho."
+  },
+  {
+    id: "gestao-liquidez-tesouraria",
+    titulo: "Otimização do Fluxo de Caixa e Liquidez Projetada",
+    setor: "Tesouraria & Gestão de Riscos",
+    problema: "Divergência entre o saldo projetado e o realizado, forçando captações de emergência com custo elevado para cobrir o fechamento do dia.",
+    jornada: [
+      {
+        ordem: 1, metodologia: "SIPOC", cor: "blue", icone: "S",
+        acao: "Mapeamento de Entradas de Caixa",
+        resultado: "Identificado que grandes resgates de aplicações de livre admissão não eram 'avisados' sistemicamente à tesouraria, entrando como ruído imprevisível no fluxo."
+      },
+      {
+        ordem: 2, metodologia: "Gráfico de Pareto", cor: "red", icone: "P",
+        acao: "Análise de Volatilidade",
+        resultado: "O cálculo mostrou que 85% da variação de liquidez vinha de apenas 4 grandes cooperados PJ. O restante da base seguia uma distribuição normal previsível."
+      },
+      {
+        ordem: 3, metodologia: "Six Sigma (Controle Estatístico)", cor: "purple", icone: "6σ",
+        acao: "Cálculo de Limites de Exposição",
+        resultado: "Implementação de 'Bandas de Flutuação' (LSC/LIC). Se a projeção de saída ultrapassa 2 desvios padrão da média histórica, o sistema dispara um alerta de 'Gatilho de Liquidez'."
+      },
+      {
+        ordem: 4, metodologia: "Poka-Yoke (Automação Python)", cor: "violet", icone: "PY",
+        acao: "Script de Varredura de Boletos",
+        resultado: "Script que lê a fila de compensação futura e antecipa em T-1 a necessidade de caixa, cruzando com os vencimentos de títulos públicos na carteira própria."
+      }
+    ],
+    as_is: ["Tesouraria olha o saldo às 16h", "Tenta captar no mercado interfinanceiro às pressas", "Paga spread alto", "Risco de desenquadramento normativo"],
+    to_be: ["Monitoramento em tempo real (D+1/D+7)", "Alertas estatísticos de volatilidade", "Captação planejada ou aplicação de excedente otimizada", "Conformidade com política de risco"],
+    impacto_final: "Redução do custo de captação de emergência e maior rentabilidade sobre o patrimônio líquido (PL) parado. Estabilidade nos indicadores de liquidez perante o órgão regulador."
+  }
+];
+
+// ─────────────────────────────────────────────────
+// AUTOR
+// ─────────────────────────────────────────────────
+const AUTOR = {
+  nome: "André L. Greboge",
+  cargo: "Finance Analyst · Systems-oriented AI Builder",
+  bio: "Designing intelligent systems with creative structure and analytical rigor. Educational content",
+  linkedin: "https://www.linkedin.com/in/andregreboge/",
+  github: "https://github.com/andreluizgreboge",
+  emoji: "👤"
+};
+
+// ─────────────────────────────────────────────────
+// THEME MAP
+// ─────────────────────────────────────────────────
+const THEME = {
+  blue:   { bg:'#eff6ff', text:'#1d4ed8', accent:'#3b82f6' },
+  red:    { bg:'#fef2f2', text:'#b91c1c', accent:'#ef4444' },
+  green:  { bg:'#f0fdf4', text:'#15803d', accent:'#22c55e' },
+  yellow: { bg:'#fefce8', text:'#a16207', accent:'#eab308' },
+  purple: { bg:'#faf5ff', text:'#7e22ce', accent:'#a855f7' },
+  violet: { bg:'#f5f3ff', text:'#5b21b6', accent:'#7c3aed' },
+  orange: { bg:'#fff7ed', text:'#c2410c', accent:'#f97316' },
+  teal:   { bg:'#f0fdfa', text:'#0f766e', accent:'#14b8a6' },
+  slate:  { bg:'#f8fafc', text:'#334155', accent:'#64748b' },
+  indigo: { bg:'#eef2ff', text:'#4338ca', accent:'#6366f1' },
+  pink:   { bg:'#fdf2f8', text:'#be185d', accent:'#ec4899' },
+};
+
+// ─────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────
+let currentFilter = 'all';
+let activeStepMap  = {};   // { casoId: stepIndex | -1 }
+
+// ─────────────────────────────────────────────────
+// SECTION SWITCH
+// ─────────────────────────────────────────────────
+function showSection(name, btn) {
+  document.querySelectorAll('.nav-btn[id^="nav-"]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  document.getElementById('section-metodologias').style.display = name === 'metodologias' ? '' : 'none';
+  document.getElementById('section-casos').style.display        = name === 'casos'         ? '' : 'none';
+  document.getElementById('cat-filters').style.display          = name === 'metodologias' ? '' : 'none';
+
+  if (name === 'casos') renderCasos();
+}
+
+// ─────────────────────────────────────────────────
+// METODOLOGIAS
+// ─────────────────────────────────────────────────
+function renderCards() {
+  const grid    = document.getElementById('cards-grid');
+  const empty   = document.getElementById('empty-state');
+  const search  = document.getElementById('search-input').value.toLowerCase().trim();
+  const counter = document.getElementById('counter');
+
+  const filtered = METODOLOGIAS.filter(m => {
+    const matchCat    = currentFilter === 'all' || m.categoria === currentFilter;
+    const matchSearch = !search ||
+      m.titulo.toLowerCase().includes(search) ||
+      m.tldr.toLowerCase().includes(search) ||
+      m.categoria.toLowerCase().includes(search);
+    return matchCat && matchSearch;
+  });
+
+  grid.innerHTML = '';
+
+  if (!filtered.length) {
+    grid.style.display = 'none';
+    empty.style.display = 'flex';
+    counter.textContent = '';
+    return;
+  }
+
+  grid.style.display = 'grid';
+  empty.style.display = 'none';
+  counter.textContent = `${filtered.length} metodologia${filtered.length !== 1 ? 's' : ''}`;
+
+  filtered.forEach((m, i) => {
+    const t    = THEME[m.cor_tema] || THEME.slate;
+    const card = document.createElement('div');
+    card.className = 'met-card';
+    card.style.cssText = `--card-accent:${t.accent};animation-delay:${i * 40}ms`;
+    card.onclick = () => openModal(m);
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:12px">
+        <span class="badge" style="background:${t.bg};color:${t.text}">
+          <span style="width:6px;height:6px;border-radius:50%;background:${t.accent};flex-shrink:0"></span>
+          ${m.categoria}
+        </span>
+        <svg style="flex-shrink:0;color:#d1d5db;margin-top:2px" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+      </div>
+      <h3 style="font-size:1rem;font-weight:700;margin:0 0 8px;color:#1c1c1e;line-height:1.3">${m.titulo}</h3>
+      <p style="font-size:0.85rem;line-height:1.65;color:#6b7280;margin:0">${m.tldr}</p>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCards();
+}
+
+// ─────────────────────────────────────────────────
+// CASOS PRÁTICOS
+// ─────────────────────────────────────────────────
+function renderCasos() {
+  const grid = document.getElementById('casos-grid');
+  document.getElementById('casos-count').textContent = CASOS_PRATICOS.length;
+  grid.innerHTML = '';
+  CASOS_PRATICOS.forEach((caso, ci) => {
+    if (activeStepMap[caso.id] === undefined) activeStepMap[caso.id] = -1;
+    grid.appendChild(buildCasoCard(caso, ci));
+  });
+}
+
+function buildCasoCard(caso, ci) {
+  const wrap = document.createElement('div');
+  wrap.className = 'caso-card';
+  wrap.id = `caso-${caso.id}`;
+  wrap.style.animationDelay = `${ci * 80}ms`;
+
+  // Header
+  wrap.innerHTML = `
+    <div class="caso-header">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+        <div>
+          <span style="font-size:0.68rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#9ca3af;display:block;margin-bottom:5px">${caso.setor}</span>
+          <h2 style="font-size:1.2rem;font-weight:700;margin:0 0 10px;color:#1c1c1e">${caso.titulo}</h2>
+          <div style="display:flex;align-items:flex-start;gap:8px">
+            <span style="font-size:0.9rem;flex-shrink:0;line-height:1.6">⚠️</span>
+            <p style="font-size:0.875rem;color:#6b7280;margin:0;line-height:1.6">${caso.problema}</p>
+          </div>
+        </div>
+        <span class="impact-pill">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Solução ponta a ponta
+        </span>
+      </div>
+    </div>
+  `;
+
+  // Body
+  const body = document.createElement('div');
+  body.className = 'caso-body';
+
+  // — Stepper label
+  const stepLabel = document.createElement('p');
+  stepLabel.className = 'section-label';
+  stepLabel.style.marginBottom = '1rem';
+  stepLabel.innerHTML = `<span style="color:#9ca3af">◆</span>&nbsp; Jornada de Solução — ${caso.jornada.length} etapas &nbsp;<span style="font-weight:400;text-transform:none;letter-spacing:0;color:#b0b7c0">(clique numa etapa para detalhar)</span>`;
+  body.appendChild(stepLabel);
+
+  // — Stepper
+  const stepper = document.createElement('div');
+  stepper.className = 'stepper';
+  stepper.id = `stepper-${caso.id}`;
+
+  caso.jornada.forEach((step, si) => {
+    const t     = THEME[step.cor] || THEME.slate;
+    const nextT = caso.jornada[si + 1] ? (THEME[caso.jornada[si + 1].cor] || THEME.slate) : null;
+
+    const item = document.createElement('div');
+    item.className = 'step-item';
+    item.id = `step-${caso.id}-${si}`;
+    item.style.setProperty('--step-color', t.accent);
+    if (nextT) item.style.setProperty('--next-color', nextT.accent);
+    if (activeStepMap[caso.id] === si) item.classList.add('active-step');
+
+    item.innerHTML = `
+      <div class="step-node" style="background:linear-gradient(135deg,${t.accent},${t.accent}dd)">${step.icone}</div>
+      <div class="step-label" style="color:${t.accent}">${step.metodologia}</div>
+      <div class="step-action">${step.acao}</div>
+    `;
+    item.addEventListener('click', () => toggleStep(caso.id, si, caso.jornada.length, caso));
+    stepper.appendChild(item);
+  });
+  body.appendChild(stepper);
+
+  // — Detail panel
+  const detail = document.createElement('div');
+  detail.className = 'step-detail';
+  detail.id = `detail-${caso.id}`;
+  if (activeStepMap[caso.id] >= 0) {
+    updateDetailPanel(detail, caso, activeStepMap[caso.id]);
+    detail.classList.add('visible');
+  }
+  body.appendChild(detail);
+
+  // — AS-IS / TO-BE
+  const mapLabel = document.createElement('p');
+  mapLabel.className = 'section-label';
+  mapLabel.style.cssText = 'margin-top:2rem;margin-bottom:1rem';
+  mapLabel.innerHTML = `<span style="color:#9ca3af">◆</span>&nbsp; Mapeamento Visual — AS-IS vs TO-BE`;
+  body.appendChild(mapLabel);
+
+  const mapGrid = document.createElement('div');
+  mapGrid.style.cssText = 'display:grid;grid-template-columns:1fr;gap:1rem';
+
+  const asisDiv = document.createElement('div');
+  asisDiv.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <span style="font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#b91c1c;background:#fef2f2;border:1px solid #fecaca;padding:2px 8px;border-radius:4px">AS-IS</span>
+      <span style="font-size:0.75rem;color:#9ca3af">Fluxo atual — com gargalos</span>
+    </div>
+    <div class="flow-diagram">${caso.as_is.map(b => `<div class="flow-block as-is">${b}</div>`).join('')}</div>
+  `;
+
+  const tobeDiv = document.createElement('div');
+  tobeDiv.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <span style="font-size:0.65rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;color:#065f46;background:#ecfdf5;border:1px solid #6ee7b7;padding:2px 8px;border-radius:4px">TO-BE</span>
+      <span style="font-size:0.75rem;color:#9ca3af">Fluxo após melhoria</span>
+    </div>
+    <div class="flow-diagram">${caso.to_be.map(b => `<div class="flow-block to-be">${b}</div>`).join('')}</div>
+  `;
+
+  mapGrid.appendChild(asisDiv);
+  mapGrid.appendChild(tobeDiv);
+  body.appendChild(mapGrid);
+
+  // — Impact bar
+  const impact = document.createElement('div');
+  impact.style.cssText = 'margin-top:1.75rem;padding:1.25rem 1.5rem;background:linear-gradient(135deg,#f0fdf4,#ecfdf5);border:1px solid #6ee7b7;border-radius:12px;display:flex;align-items:flex-start;gap:14px';
+  impact.innerHTML = `
+    <div style="width:36px;height:36px;background:#065f46;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+    </div>
+    <div>
+      <p style="font-size:0.68rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#065f46;margin:0 0 4px">Impacto Final</p>
+      <p style="font-size:0.9rem;font-weight:600;color:#064e3b;margin:0;line-height:1.5">${caso.impacto_final}</p>
+    </div>
+  `;
+  body.appendChild(impact);
+
+  wrap.appendChild(body);
+  return wrap;
+}
+
+function toggleStep(casoId, stepIndex, total, caso) {
+  const panel  = document.getElementById(`detail-${casoId}`);
+  const isOpen = panel.classList.contains('visible');
+  const isSame = activeStepMap[casoId] === stepIndex;
+
+  // Deactivate all nodes
+  for (let i = 0; i < total; i++) {
+    const el = document.getElementById(`step-${casoId}-${i}`);
+    if (el) el.classList.remove('active-step');
+  }
+
+  if (isOpen && isSame) {
+    panel.classList.remove('visible');
+    activeStepMap[casoId] = -1;
+    return;
+  }
+
+  activeStepMap[casoId] = stepIndex;
+  const node = document.getElementById(`step-${casoId}-${stepIndex}`);
+  if (node) node.classList.add('active-step');
+
+  updateDetailPanel(panel, caso, stepIndex);
+  panel.classList.add('visible');
+}
+
+function updateDetailPanel(panel, caso, idx) {
+  if (idx < 0 || !caso || idx >= caso.jornada.length) return;
+  const step = caso.jornada[idx];
+  const t    = THEME[step.cor] || THEME.slate;
+
+  panel.style.borderLeftColor = t.accent;
+  panel.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+      <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,${t.accent},${t.accent}cc);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;font-family:'DM Mono',monospace;flex-shrink:0;box-shadow:0 4px 12px ${t.accent}44">${step.icone}</div>
+      <div>
+        <p style="margin:0;font-weight:700;font-size:0.95rem;color:#1c1c1e">Etapa ${step.ordem} — ${step.metodologia}</p>
+        <p style="margin:0;font-size:0.78rem;color:${t.accent};font-weight:600">${step.acao}</p>
+      </div>
+      <span style="margin-left:auto;font-size:0.68rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;background:${t.bg};color:${t.text};padding:3px 10px;border-radius:99px;flex-shrink:0">${step.ordem} de ${caso.jornada.length}</span>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem">
+      <p style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#9ca3af;margin:0 0 6px">Resultado desta etapa</p>
+      <p style="font-size:0.875rem;line-height:1.75;color:#374151;margin:0">${step.resultado}</p>
+    </div>
+  `;
+}
+
+// ─────────────────────────────────────────────────
+// MODAL
+// ─────────────────────────────────────────────────
+function openModal(m) {
+  const t = THEME[m.cor_tema] || THEME.slate;
+  document.getElementById('modal-title').textContent    = m.titulo;
+  document.getElementById('modal-tldr').textContent     = `"${m.tldr}"`;
+  document.getElementById('modal-o_que_e').textContent  = m.o_que_e;
+  document.getElementById('modal-explicacao').textContent = m.explicacao;
+  document.getElementById('modal-exemplo').textContent  = m.exemplo_generico;
+  document.getElementById('modal-exemplo').style.borderLeftColor = t.accent;
+
+  const badge = document.getElementById('modal-badge');
+  badge.textContent = m.categoria;
+  badge.style.background = t.bg;
+  badge.style.color = t.text;
+
+  document.getElementById('modal-pros').innerHTML = (m.pros || []).map(p =>
+    `<div class="pro-item"><span style="color:#22c55e;line-height:1.2;flex-shrink:0">✓</span><span>${p}</span></div>`).join('');
+  document.getElementById('modal-cons').innerHTML = (m.cons || []).map(c =>
+    `<div class="con-item"><span style="color:#ef4444;line-height:1.2;flex-shrink:0">✕</span><span>${c}</span></div>`).join('');
+
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal-backdrop')) return;
+  forceCloseModal();
+}
+function forceCloseModal() {
+  document.getElementById('modal-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') forceCloseModal(); });
+
+// ─────────────────────────────────────────────────
+// AUTHOR
+// ─────────────────────────────────────────────────
+function populateAuthor() {
+  document.getElementById('author-name').textContent  = AUTOR.nome;
+  document.getElementById('author-role').textContent  = AUTOR.cargo;
+  document.getElementById('author-bio').textContent   = AUTOR.bio;
+  document.getElementById('author-linkedin').href     = AUTOR.linkedin;
+  document.getElementById('author-github').href       = AUTOR.github;
+  const av = document.getElementById('author-avatar');
+  if (AUTOR.emoji && !AUTOR.emoji.startsWith('http')) {
+    av.textContent = AUTOR.emoji;
+  } else if (AUTOR.emoji.startsWith('http')) {
+    av.innerHTML = `<img src="${AUTOR.emoji}" style="width:100%;height:100%;border-radius:50%;object-fit:cover"/>`;
+  }
+}
+
+// ─────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────
+populateAuthor();
+renderCards();
+document.getElementById('casos-count').textContent = CASOS_PRATICOS.length;
+</script>
+</body>
+</html>
