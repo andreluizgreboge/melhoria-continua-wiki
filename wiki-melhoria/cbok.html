@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estudando o CBOK® 4.0 — Wiki de Melhoria Contínua</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .cbok-bg {
+      position: fixed; inset: 0; z-index: -1;
+      background: linear-gradient(135deg, #f8f5ff 0%, #faf3ff 40%, #f0eeff 100%);
+    }
+    .cbok-nav-btn {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 12px 16px; border-radius: 8px;
+      font-size: 0.85rem; font-weight: 500; color: var(--text-secondary);
+      background: transparent; border: none; cursor: pointer;
+      text-align: left; transition: all 0.2s; border-left: 3px solid transparent;
+    }
+    .cbok-nav-btn:hover { background: #f5f3ff; color: #7e22ce; }
+    .cbok-nav-btn.active {
+      background: #f3e8ff; color: #6b21a8; border-left-color: #a855f7; font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+<div class="cbok-bg"></div>
+
+<nav id="topnav">
+  <a href="index.html" class="topnav-brand">
+    <div class="brand-icon"><svg width="16" height="16" fill="none"><path d="M8 2L10 6H14L11 9L12 13L8 11L4 13L5 9L2 6H6L8 2Z" fill="white"/></svg></div>
+    <div><span class="brand-text-small">Wiki de</span><span class="brand-text-main">Melhoria Contínua</span></div>
+  </a>
+  <div class="topnav-links">
+    <a href="index.html" class="nav-link">Home (Wiki)</a>
+    <a href="fundamentos.html" class="nav-link">Fundamentos</a>
+    <a href="cbok.html" class="nav-link active">Estudando o CBOK® 4.0</a>
+    <a href="semaforo.html" class="nav-link">Case Semáforo</a>
+  </div>
+</nav>
+
+<aside id="sidebar">
+  <div style="padding:1.5rem; border-bottom:1px solid var(--border)">
+    <p class="section-label">Domínios de Conhecimento</p>
+    <div id="cbok-menu" style="display:flex; flex-direction:column; gap:4px; margin-top:1rem">
+      <button class="cbok-nav-btn active" data-view="visao_geral">📘 Visão Geral v4.0</button>
+      <button class="cbok-nav-btn" data-view="modelagem">🎨 Modelagem (Cap. 3)</button>
+      <button class="cbok-nav-btn" data-view="tecnologia">💻 Tecnologia e BPMS</button>
+    </div>
+  </div>
+  <div style="flex:1"></div>
+  <div class="author-card">
+    <p style="font-size:0.7rem; color:#9ca3af; margin-bottom:8px">PROCESSO DE ESTUDO</p>
+    <div style="width:100%; background:#e2e8f0; height:6px; border-radius:3px">
+      <div style="width:15%; background:#a855f7; height:100%; border-radius:3px"></div>
+    </div>
+    <p style="font-size:0.65rem; color:#6b7280; margin-top:5px">15% concluído</p>
+  </div>
+</aside>
+
+<main id="main">
+  <div id="content-area" style="max-width: 850px;">
+    <div id="dynamic-cbok-content" class="fadeInUp">
+       <!-- Conteúdo injetado via JS -->
+    </div>
+  </div>
+</main>
+
+<script src="js/dados.js"></script>
+<script>
+  const menuBtns = document.querySelectorAll('.cbok-nav-btn');
+  const contentArea = document.getElementById('dynamic-cbok-content');
+
+  function renderCBOK(view) {
+    if (typeof DATA_CBOK !== 'undefined' && DATA_CBOK[view]) {
+      const data = DATA_CBOK[view];
+      contentArea.innerHTML = `
+        <div class="fadeInUp">
+          <div class="badge" style="background:#f3e8ff; color:#6b21a8; margin-bottom:1rem">CBOK® v4.0 Knowledge</div>
+          <h1 style="font-size:1.75rem; font-weight:800; color:#1c1c1e; margin:0 0 1.5rem">${data.titulo}</h1>
+          <div class="prose-text">${data.html}</div>
+        </div>
+      `;
+    }
+  }
+
+  menuBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      menuBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderCBOK(btn.getAttribute('data-view'));
+    });
+  });
+
+  window.onload = () => renderCBOK('visao_geral');
+</script>
+</body>
+</html>
