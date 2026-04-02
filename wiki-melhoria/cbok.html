@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estudando o CBOK® 4.0 — Wiki de Melhoria Contínua</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .cbok-bg {
+      position: fixed; inset: 0; z-index: -1;
+      background: linear-gradient(135deg, #f8f5ff 0%, #faf3ff 40%, #f0eeff 100%);
+    }
+    .cbok-nav-btn {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 12px 16px; border-radius: 8px;
+      font-size: 0.85rem; font-weight: 500; color: var(--text-secondary);
+      background: transparent; border: none; cursor: pointer;
+      text-align: left; transition: all 0.2s; border-left: 3px solid transparent;
+    }
+    .cbok-nav-btn:hover { background: #f5f3ff; color: #7e22ce; }
+    .cbok-nav-btn.active {
+      background: #f3e8ff; color: #6b21a8; border-left-color: #a855f7; font-weight: 700;
+    }
+    .welcome-card {
+      background: white; padding: 2rem; border-radius: 12px; border: 1px solid #e9d5ff;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+  </style>
+</head>
+<body>
+
+<div class="cbok-bg"></div>
+
+<nav id="topnav">
+  <a href="index.html" class="topnav-brand">
+    <div class="brand-icon"><svg width="16" height="16" fill="none"><path d="M8 2L10 6H14L11 9L12 13L8 11L4 13L5 9L2 6H6L8 2Z" fill="white"/></svg></div>
+    <div><span class="brand-text-small">Wiki de</span><span class="brand-text-main">Melhoria Contínua</span></div>
+  </a>
+  <div class="topnav-links">
+    <a href="index.html" class="nav-link">Home (Wiki)</a>
+    <a href="fundamentos.html" class="nav-link">Fundamentos</a>
+    <a href="cbok.html" class="nav-link active">Estudando o CBOK® 4.0</a>
+  </div>
+</nav>
+
+<aside id="sidebar">
+  <div style="padding:1.5rem; border-bottom:1px solid var(--border)">
+    <p class="section-label">Domínios de Conhecimento</p>
+    <div id="cbok-menu" style="display:flex; flex-direction:column; gap:4px; margin-top:1rem">
+
+        <button class="cbok-nav-btn" data-view="cap_3_1_definicao">Cap. 3.1 - Definição e Princípios</button>
+        <button class="cbok-nav-btn" data-view="cap_3_5_ciclo_vida">Cap. 3.1.5 - Ciclo de Vida BPM</button>
+        <button class="cbok-nav-btn" data-view="cap_3_6_tipos_processo">Cap. 3.1.6 - Tipos de Processos</button>
+        <button class="cbok-nav-btn" data-view="cap_3_7_atividades">Cap. 3.1.7 - Atividades e Valor</button>
+
+        <p class="section-label" style="font-size:0.6rem; margin-top:10px">MODELAGEM TÉCNICA (CAP. 4)</p>
+        <button class="cbok-nav-btn" data-view="cap_4_1_estatico_dinamico">Cap. 4.1.3 - Estático vs Dinâmico</button>
+        <button class="cbok-nav-btn" data-view="cap_4_5_bpmn">Cap. 4.5.2 - Padrão BPMN 2.0</button>
+        <button class="cbok-nav-btn" data-view="cap_4_6_niveis">Cap. 4.6 - Níveis de Modelagem</button>
+        <button class="cbok-nav-btn" data-view="cap_4_11_simulacao">Cap. 4.11 - Validação e Simulação</button>
+
+        <p class="section-label" style="font-size:0.6rem; margin-top:10px">ANÁLISE PROFUNDA (CAP. 5)</p>
+        <button class="cbok-nav-btn" data-view="cap_5_1_execucao">Cap. 5.1.8 - Medição: Custo e Variação</button>
+        <button class="cbok-nav-btn" data-view="cap_5_1_sistemas">Cap. 5.1.11 - Sistemas e Fluxo de Dados</button>
+        <button class="cbok-nav-btn" data-view="cap_5_1_causa_raiz">Cap. 5.1.12.2 - Análise de Causa Raiz</button>
+        <button class="cbok-nav-btn" data-view="cap_5_1_tempo_ciclo">Cap. 5.1.12.3 - Tempo de Ciclo</button>
+        <button class="cbok-nav-btn" data-view="cap_5_1_interacao_humana">Cap. 5.1.13 - Interações Humanas</button>
+        <button class="cbok-nav-btn" data-view="cap_5_1_maturidade">Cap. 5.1.15 - Maturidade de Processos</button>
+        <button class="cbok-nav-btn" data-view="cap_5_1_paralisia">Cap. 5.1.16.4 - Evitando Paralisia de Análise</button>
+
+        <p class="section-label" style="font-size:0.6rem; margin-top:10px">DESENHO E FUTURO (CAP. 6)</p>
+        <button class="cbok-nav-btn" data-view="cap_6_1_valor">Cap. 6.1.1 - O Valor do Desenho</button>
+        <button class="cbok-nav-btn" data-view="cap_6_1_infra_ti">Cap. 6.1.4.4 - Infraestrutura de TI</button>
+        <button class="cbok-nav-btn" data-view="cap_6_1_principios">Cap. 6.1.5 - Princípios de Desenho</button>
+        <button class="cbok-nav-btn" data-view="cap_6_1_handoffs">Cap. 6.1.5.3 - Minimizando Handoffs</button>
+        <button class="cbok-nav-btn" data-view="cap_6_1_lote">Cap. 6.1.5.8 - Redução do Tamanho do Lote</button>
+        <button class="cbok-nav-btn" data-view="cap_6_1_redesenho_auto">Cap. 6.1.5.12 - Redesenhar vs Automatizar</button>
+        <button class="cbok-nav-btn" data-view="cap_6_1_regras">Cap. 6.1.7 - Regras de Processos</button>
+        <button class="cbok-nav-btn" data-view="cap_6_1_sucesso">Cap. 6.1.10 - Fatores Críticos de Sucesso</button>
+
+        <p class="section-label" style="font-size:0.6rem; margin-top:10px">MEDIÇÃO E DESEMPENHO</p>
+        <button class="cbok-nav-btn" data-view="cap_7_1_metricas">Cap. 7.1 - Métricas e Definições</button>
+        <button class="cbok-nav-btn" data-view="cap_7_3_voz_processo">Cap. 7.3.1.2 - A Voz do Processo</button>
+        <button class="cbok-nav-btn" data-view="cap_7_3_bsc">Cap. 7.3.3 - Balanced Scorecard (BSC)</button>
+
+        <p class="section-label" style="font-size:0.6rem; margin-top:10px">TECNOLOGIA E ARQUITETURA</p>
+        <button class="cbok-nav-btn" data-view="cap_8_1_transf_digital">Cap. 8.1 - Transformação Digital Real</button>
+        <button class="cbok-nav-btn" data-view="cap_8_3_canvas_porter">Cap. 8.3.3 - Canvas e Estratégia Porter</button>
+        <button class="cbok-nav-btn" data-view="cap_8_5_ibpms_regras">Cap. 8.5.5 - Motores de Regras (BRMS)</button>
+        <button class="cbok-nav-btn" data-view="cap_8_6_rpa_falhas">Cap. 8.6.1.10 - 5 Razões de Falha em RPA</button>
+
+        <p class="section-label" style="font-size:0.6rem; margin-top:10px">CULTURA E GOVERNANÇA</p>
+        <button class="cbok-nav-btn" data-view="cap_9_4_organizacao_matriz">Cap. 9.4.1 - Matriz de Desempenho</button>
+        <button class="cbok-nav-btn" data-view="cap_9_5_papeis_responsa">Cap. 9.5.9 - Funções: Dono vs Arquiteto</button>
+        <button class="cbok-nav-btn" data-view="cap_9_5_coe_bpm">Cap. 9.5.12 - Centro de Excelência (CoE)</button>
+
+        <p class="section-label" style="font-size:0.6rem; margin-top:10px">GESTÃO CORPORATIVA (EPM)</p>
+        <button class="cbok-nav-btn" data-view="cap_10_1_epm_def">Cap. 10.1.1 - Definição de EPM</button>
+        <button class="cbok-nav-btn" data-view="cap_10_1_portfolio">Cap. 10.1.5 - Gestão de Portfólio</button>
+        <button class="cbok-nav-btn" data-view="cap_10_1_maturidade">Cap. 10.1.8 - Maturidade BPM</button>
+
+
+      </div>
+  </div>
+
+</aside>
+
+<main id="main">
+  <div id="content-area" style="max-width: 850px;">
+    <div id="dynamic-cbok-content" class="fadeInUp">
+       <div class="welcome-card">
+          <div class="badge" style="background:#f3e8ff; color:#6b21a8; margin-bottom:1rem">Documentação Técnica</div>
+          <h1 style="font-size:1.75rem; font-weight:800; color:#1c1c1e; margin:0 0 1rem">Fichamento Estruturado: CBOK® 4.0</h1>
+          <p style="color:var(--text-secondary); line-height:1.6; margin-bottom:1.5rem">
+            Esta página serve como um repositório centralizado de fichamentos e notas técnicas baseadas no <strong>Guia para o Gerenciamento de Processos de Negócio (BPM CBOK® 4.0)</strong> em português. 
+          </p>
+          <div style="background:#f8f9fa; border-left:4px solid #a855f7; padding:1rem; margin-bottom:1.5rem">
+            <p style="font-size:0.9rem; color:#4b5563; font-weight:500">
+              💡 <strong>Como utilizar:</strong> Navegue pelos capítulos no <strong>menu lateral esquerdo</strong> para visualizar os conceitos, tabelas e análises de cada domínio de conhecimento.
+            </p>
+          </div>
+          <p style="font-size:0.85rem; color:#6b7280">
+            Destinado a consulta rápida para profissionais de BPM, Melhoria Contínua e arquitetura de processos.
+          </p>
+       </div>
+    </div>
+  </div>
+</main>
+
+<script src="js/dados.js"></script>
+<script>
+  const menuBtns = document.querySelectorAll('.cbok-nav-btn');
+  const contentArea = document.getElementById('dynamic-cbok-content');
+
+  function renderCBOK(view) {
+    if (typeof DATA_CBOK !== 'undefined' && DATA_CBOK[view]) {
+      const data = DATA_CBOK[view];
+      contentArea.innerHTML = `
+        <div class="fadeInUp">
+          <div class="badge" style="background:#f3e8ff; color:#6b21a8; margin-bottom:1rem">CBOK® v4.0 Knowledge</div>
+          <h1 style="font-size:1.75rem; font-weight:800; color:#1c1c1e; margin:0 0 1.5rem">${data.titulo}</h1>
+          <div class="prose-text">${data.html}</div>
+        </div>
+      `;
+      // Rola para o topo ao trocar de conteúdo
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  menuBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      menuBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderCBOK(btn.getAttribute('data-view'));
+    });
+  });
+
+  // O carregamento inicial agora mantém o HTML estático de boas-vindas
+  // Apenas se houver um hash ou necessidade específica, chamaríamos renderCBOK aqui.
+</script>
+</body>
+</html>
